@@ -3,7 +3,7 @@
    Plataformas estilo Prince of Persia · Canvas 2D · cero assets
    ============================================================ */
 'use strict';
-console.log('[TUMBA-2D] v1 · papiro vivo');
+console.log('[TUMBA-2D] v2 · tres cámaras');
 
 /* ================= constantes ================= */
 const VW = 1280, VH = 720;              // lienzo lógico
@@ -29,8 +29,9 @@ const KEYMAP = {
 addEventListener('keydown', e => {
   const k = KEYMAP[e.key.toLowerCase()];
   if (k) { keys[k] = true; e.preventDefault(); }
-  if (e.key === 'Enter' && state === 'title') startGame();
-  if (e.key.toLowerCase() === 'r' && (state === 'dead' || state === 'win')) startGame();
+  if (e.key === 'Enter' && state === 'title') { camIdx = 0; startGame(); }
+  if (e.key.toLowerCase() === 'r' && state === 'dead') startGame();
+  if (e.key.toLowerCase() === 'r' && state === 'win') { camIdx = 0; startGame(); }
   if (e.key.toLowerCase() === 'm') sfxMuted = !sfxMuted;
 });
 addEventListener('keyup', e => {
@@ -43,25 +44,58 @@ addEventListener('keyup', e => {
    I: declaración · G: oro · M: mural-escondite · A: spawn de Ammit
    F: spawn del Faraón · L: led platform (se hunde si pesas) · X: sarcófago
    #: pilar decorativo (no colisiona) · ~: arena (baja lento)         */
-const LEVEL = [
-  '########################',
-  '#.......D..........G...#',
-  '#.....PPPPP.....PPPPPP.#',
-  '#...PPPPP.....PPPPP....#',
-  '#.......PPPPP..........#',
-  '#.......I...PPPPP......#',
-  '#.....PPPPP............#',
-  '#.........PPPPP........#',
-  '#...PPPPP.M............#',
-  '#.......PPPPP..........#',
-  '#...........PPPPP......#',
-  '#.....PPPPP...X........#',
-  '#.....I...PPPPP........#',
-  '#...PPPPP..............#',
-  '#.F.................A..#',
-  '########################',
+const LEVELS = [
+  { name: 'I · EL CORREDOR', map: [
+    '############################################',
+    '#..........................................#',
+    '#..........................................#',
+    '#..........................................#',
+    '#..........................................#',
+    '#..........................................#',
+    '#..........................................#',
+    '#..........................................#',
+    '#........I...........I.....................#',
+    '#.......PPPP........PPPP......PPPP.........#',
+    '#.F.....................M.....A..G...X...D.#',
+    '############################################',
+  ] },
+  { name: 'II · EL POZO', map: [
+    '########################',
+    '#.......D..........G...#',
+    '#PPPPPPPPPP.....PPPPPP.#',
+    '#.........PPPP.........#',
+    '#...PPPPP..............#',
+    '#.......I.....PPPPP....#',
+    '#......PPPP............#',
+    '#.PPPPP................#',
+    '#........PPPP....M.....#',
+    '#...............PPPP...#',
+    '#....PPPPP..I..........#',
+    '#..........PPPP........#',
+    '#.........X......PPPPP.#',
+    '#...PPPPPPPPP..........#',
+    '#.F.................A..#',
+    '########################',
+  ] },
+  { name: 'III · LA ESCALERA', map: [
+    '########################################',
+    '#......................................#',
+    '#......................................#',
+    '#......................................#',
+    '#...................................D..#',
+    '#.................................PPPP.#',
+    '#......................................#',
+    '#.........................I...PPPP.....#',
+    '#..................I....PPPP...........#',
+    '#.................PPPP.................#',
+    '#...........PPPP.......................#',
+    '#.....PPPP.............................#',
+    '#.F.............M.....A.......G....X...#',
+    '########################################',
+  ] },
 ];
-const LW = 24, LH = 16;                 // ancho/alto en tiles
+let camIdx = 0;                        // cámara actual
+let LW = 24, LH = 16;                  // dimensiones de la cámara activa (se recalculan)
 const TS = 60;                          // tamaño de tile en px
 
 
@@ -75,7 +109,8 @@ function boot() {
 }
 
 function buildLevel() {
-  level = LEVEL.map(r => r.split(''));
+  level = LEVELS[camIdx].map.map(r => r.split(''));
+  LW = level[0].length; LH = level.length;
   levelW = LW * TS; levelH = LH * TS;
   items = []; particles = [];
   P = { x: 0, y: 0, vx: 0, vy: 0, dir: 1, ground: false, anim: 0, frame: 0, hidden: false, hideT: 0, decl: 0, gold: false, climb: null, coyote: 0, jumpBuf: 0 };
@@ -192,7 +227,10 @@ function updatePlayer(dt) {
 
   /* puerta: victoria con las 2 declaraciones */
   if (door && Math.abs(P.x + 17 - (door.x + TS / 2)) < 40 && Math.abs(P.y + 28 - (door.y + TS / 2)) < 60) {
-    if (P.decl >= 2) { state = 'win'; sfxWin(); document.getElementById('win').classList.remove('hidden'); }
+    if (P.decl >= 2) {
+      if (camIdx < LEVELS.length - 1) { camIdx++; startGame(); toast('Cámara superada. La Duat se abre.'); }
+      else { state = 'win'; sfxWin(); document.getElementById('win').classList.remove('hidden'); }
+    }
     else toast('La puerta está sellada. <em>Faltan declaraciones (' + P.decl + '/2).</em>');
   }
 }
@@ -485,6 +523,11 @@ function drawParticles(d) {
 }
 
 function drawHUD() {
+  /* nombre de cámara arriba-centro */
+  cx.save();
+  cx.font = 'bold 15px Georgia'; cx.textAlign = 'center'; cx.fillStyle = '#8a6f3e';
+  cx.fillText('CÁMARA ' + LEVELS[camIdx].name, VW / 2, 40);
+  cx.restore();
   /* corazón ib latiendo arriba-izquierda */
   const beat = Math.sin(time * (P.gold ? 9 : 5)) * 0.5 + 0.5;
   cx.save();
@@ -519,7 +562,7 @@ function roundRect(x, y, w, h, r) {
   cx.moveTo(x + r, y);
   cx.arcTo(x + w, y, x + w, y + h, r);
   cx.arcTo(x + w, y + h, x, y + h, r);
-  cx.arcTo(x, y + h, x, r);
+  cx.arcTo(x, y + h, x, y, r);
   cx.arcTo(x, y, x + w, y, r);
   cx.closePath();
 }
@@ -585,7 +628,7 @@ function loop(ts) {
 /* ================= arranque ================= */
 if (typeof window !== 'undefined' && !window.__TEROS_TEST__) {
   window.__DBG = () => ({
-    state, player: { x: P.x, y: P.y, decl: P.decl, gold: P.gold, hidden: P.hidden, ground: P.ground },
+    cam: camIdx, state, player: { x: P.x, y: P.y, decl: P.decl, gold: P.gold, hidden: P.hidden, ground: P.ground },
     ammit: { x: A.x, chasing: A.chasing },
     near: items.filter(i => !i.taken && Math.hypot(P.x - i.x, P.y - i.y) < 90).map(i => ({ type: i.type, d: +Math.hypot(P.x - i.x, P.y - i.y).toFixed(0) }))
   });
@@ -594,5 +637,5 @@ if (typeof window !== 'undefined' && !window.__TEROS_TEST__) {
 
 /* pruebas en Node */
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { buildLevel, startGame, updatePlayer, updateAmmit, state: () => state, P: () => P, A: () => A, items: () => items, LEVEL, keys };
+  module.exports = { buildLevel, startGame, updatePlayer, updateAmmit, state: () => state, P: () => P, A: () => A, items: () => items, LEVELS, setCamera: i => { camIdx = i; startGame(); }, camIdx: () => camIdx, keys };
 }

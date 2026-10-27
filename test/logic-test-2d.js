@@ -79,23 +79,40 @@ G.keys.act = false;
 for (let i = 0; i < 30; i++) G.updatePlayer(1 / 60);
 ok(!P.hidden, 'sales del sarcófago al soltar E');
 
-/* segunda declaración y puerta */
+/* segunda declaración y puerta: avanza de cámara */
 const decl2 = G.items().find(i => i.type === 'decl' && !i.taken);
 P.x = decl2.x - 17; P.y = decl2.y - 28; P.vy = 0;
 for (let i = 0; i < 5; i++) G.updatePlayer(1 / 60);
 ok(P.decl === 2, 'segunda declaración recogida');
-
-/* victoria en la puerta (arriba del todo) */
 const doorPos = (() => {
-  for (let r = 0; r < G.LEVEL.length; r++) {
-    const c = G.LEVEL[r].indexOf('D');
+  const m = G.LEVELS[G.camIdx()].map;
+  for (let r = 0; r < m.length; r++) {
+    const c = m[r].indexOf('D');
     if (c >= 0) return { r, c };
   } return null;
 })();
-ok(doorPos, 'la puerta existe en el nivel');
+ok(doorPos, 'la puerta existe en la cámara');
 P.x = doorPos.c * 60 + 30 - 17; P.y = doorPos.r * 60 + 30 - 28; P.vy = 0;
 for (let i = 0; i < 5; i++) G.updatePlayer(1 / 60);
-ok(G.state() === 'win', 'victoria con 2 declaraciones en la puerta');
+ok(G.camIdx() === 1 && G.state() === 'playing', 'la puerta avanza a la cámara II');
+
+/* en la ÚLTIMA cámara la puerta da la victoria */
+G.setCamera(G.LEVELS.length - 1);
+const PL = G.P();
+const dl = (() => {
+  const m = G.LEVELS[G.LEVELS.length - 1].map;
+  for (let r = 0; r < m.length; r++) { const c = m[r].indexOf('D'); if (c >= 0) return { r, c }; }
+})();
+/* recoger las 2 declaraciones de la última cámara */
+let got = 0;
+for (const it of G.items().filter(i => i.type === 'decl')) {
+  PL.x = it.x - 17; PL.y = it.y - 28; PL.vy = 0;
+  for (let i = 0; i < 5; i++) G.updatePlayer(1 / 60);
+  if (PL.decl > got) got = PL.decl;
+}
+PL.x = dl.c * 60 + 30 - 17; PL.y = dl.r * 60 + 30 - 28; PL.vy = 0;
+for (let i = 0; i < 5; i++) G.updatePlayer(1 / 60);
+ok(G.state() === 'win', 'en la última cámara la puerta da la victoria');
 
 /* Ammit: muerte por proximidad */
 G.startGame();
