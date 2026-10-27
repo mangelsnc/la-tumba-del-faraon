@@ -1,6 +1,6 @@
 # 𓂀 La Tumba del Faraón
 
-**Demo técnica 2.5D** · three.js r128 · cero assets externos (todo el arte se genera proceduralmente en canvas).
+**Plataformas 2D puro** · Canvas 2D · cero assets externos (todo el arte se genera proceduralmente en canvas).
 
 Eres el Faraón. Has muerto y despiertas en la Duat. Tu corazón pesa.
 Reúne las **dos declaraciones** y alcanza la **Puerta del Alba**.
@@ -8,7 +8,7 @@ Ammit, la devoradora, patrulla el carril del fondo. Si te ve, corre.
 
 ## Cómo jugar
 
-Abre `index.html` en cualquier navegador moderno. No requiere servidor ni conexión.
+Abre `index.html` en cualquier navegador moderno. No requiere servidor ni conexión. La demo técnica 2.5D anterior está archivada en `index3d.html`.
 
 | Tecla | Acción |
 |---|---|

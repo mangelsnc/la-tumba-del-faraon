@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Tumba del Faraón — Demo</title>
+<style>
+  :root{
+    --gold:#c9a227;
+    --gold-bright:#e8c766;
+    --bone:#cbb98a;
+    --dim:#8a7a52;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:100%;height:100%;overflow:hidden;background:#000}
+  body{font-family:Georgia,'Times New Roman',serif;color:var(--bone)}
+
+  #game{position:fixed;inset:0}
+  #game canvas{display:block}
+
+  /* ---- capas de atmósfera ---- */
+  #vignette{position:fixed;inset:0;pointer-events:none;z-index:2;
+    background:radial-gradient(ellipse at 50% 45%, transparent 42%, rgba(0,0,0,.5) 76%, rgba(0,0,0,.93) 100%)}
+  #danger{position:fixed;inset:0;pointer-events:none;z-index:3;opacity:0;transition:opacity .35s;
+    background:radial-gradient(ellipse at 50% 50%, transparent 42%, rgba(122,12,6,.55) 100%)}
+
+  /* ---- HUD ---- */
+  #hud{position:fixed;top:18px;left:22px;pointer-events:none;z-index:5;display:flex;flex-direction:column;gap:10px}
+  #heartWrap{display:flex;align-items:center;gap:9px}
+  #heartIb{width:31px;height:31px;filter:drop-shadow(0 0 7px rgba(201,162,39,.45));will-change:transform}
+  #heartLabel{font-size:12px;letter-spacing:.32em;color:var(--gold);opacity:.75}
+  #cartouches{display:flex;align-items:center;gap:8px;margin-top:2px}
+  .slot{width:37px;height:17px;border:1.5px solid #4a3d1c;border-radius:9px/12px;opacity:.7;transition:all .45s}
+  .slot.filled{border-color:var(--gold-bright);opacity:1;
+    background:linear-gradient(180deg, rgba(232,199,102,.85), rgba(160,120,35,.65));
+    box-shadow:0 0 11px rgba(201,162,39,.5)}
+  #cartLabel{font-size:11.5px;letter-spacing:.2em;color:#9c8a5a}
+
+  #toast{position:fixed;top:13%;left:50%;transform:translateX(-50%);z-index:5;pointer-events:none;
+    font-size:17px;letter-spacing:.12em;color:var(--gold-bright);text-align:center;max-width:72%;
+    line-height:1.55;opacity:0;transition:opacity .5s;
+    text-shadow:0 0 16px rgba(201,162,39,.35), 0 2px 6px rgba(0,0,0,.9)}
+  #hint{position:fixed;bottom:9%;left:50%;transform:translateX(-50%);z-index:5;pointer-events:none;
+    font-size:14px;letter-spacing:.16em;color:var(--bone);opacity:0;transition:opacity .3s;
+    text-shadow:0 2px 6px rgba(0,0,0,.9)}
+  #controlsHint{position:fixed;bottom:16px;right:20px;z-index:5;pointer-events:none;
+    font-size:11.5px;letter-spacing:.08em;color:var(--dim);opacity:0;transition:opacity 1.2s}
+
+  kbd{display:inline-block;min-width:26px;text-align:center;padding:3px 9px;margin:0 2px;
+    border:1px solid #5a4a20;border-radius:5px;background:rgba(201,162,39,.07);
+    color:var(--gold-bright);font-family:inherit;font-size:12.5px;letter-spacing:.05em}
+
+  /* ---- pantallas ---- */
+  .screen{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;background:rgba(3,2,1,.95);text-align:center;padding:24px;
+    transition:opacity .8s}
+  .screen.hidden{opacity:0;pointer-events:none}
+  .screen h1{font-size:clamp(26px,4.6vw,50px);letter-spacing:.28em;color:var(--gold-bright);
+    font-weight:normal;text-shadow:0 0 26px rgba(201,162,39,.3);margin-bottom:8px}
+  .screen h1.red{color:#c0392b;text-shadow:0 0 26px rgba(160,30,20,.5)}
+  .sub{font-size:13px;letter-spacing:.42em;color:var(--dim);margin-bottom:34px}
+  .quote{font-size:15.5px;font-style:italic;color:var(--bone);opacity:.85;line-height:1.7;margin-bottom:30px}
+  .ctrl{display:grid;grid-template-columns:auto auto;gap:11px 26px;font-size:14px;
+    color:var(--bone);margin-bottom:36px;text-align:left;align-items:center}
+  .ctrl span:nth-child(odd){text-align:right}
+  .ctrl span:nth-child(even){letter-spacing:.1em;color:#a8966c}
+  .divider{width:230px;height:1px;background:linear-gradient(90deg,transparent,#5a4a20,transparent);margin:20px 0 26px}
+  .pressKey{font-size:15px;letter-spacing:.28em;color:var(--gold);animation:breathe 2.3s infinite}
+  @keyframes breathe{0%,100%{opacity:.4}50%{opacity:1}}
+
+  #winStars{position:absolute;inset:0;pointer-events:none;opacity:.75;animation:twinkle 4.5s ease-in-out infinite;
+    background-image:
+      radial-gradient(2px 2px at 12% 22%, #e8c766 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 27% 64%, #cbb98a 50%, transparent 51%),
+      radial-gradient(2px 2px at 38% 34%, #e8c766 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 44% 78%, #a8966c 50%, transparent 51%),
+      radial-gradient(2.5px 2.5px at 57% 18%, #e8c766 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 66% 58%, #cbb98a 50%, transparent 51%),
+      radial-gradient(2px 2px at 74% 30%, #e8c766 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 83% 70%, #a8966c 50%, transparent 51%),
+      radial-gradient(2px 2px at 91% 24%, #e8c766 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 18% 84%, #cbb98a 50%, transparent 51%),
+      radial-gradient(2px 2px at 6% 52%, #e8c766 50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 96% 48%, #cbb98a 50%, transparent 51%)}
+  @keyframes twinkle{0%,100%{opacity:.45}50%{opacity:.95}}
+</style>
+</head>
+<body>
+
+  <div id="game"></div>
+  <div id="vignette"></div>
+  <div id="danger"></div>
+
+  <div id="hud">
+    <div id="heartWrap">
+      <svg id="heartIb" viewBox="0 0 24 24" fill="none" stroke="#c9a227" stroke-width="1.7" stroke-linecap="round">
+        <path d="M8 6.5 h8 v3 h-8 z"/>
+        <path d="M7 9.5 h10 v9 a2.6 2.6 0 0 1 -2.6 2.6 h-4.8 a2.6 2.6 0 0 1 -2.6 -2.6 z"/>
+        <path d="M7 11.5 c-3.6 0 -3.6 4.8 0 4.8"/>
+        <path d="M17 11.5 c3.6 0 3.6 4.8 0 4.8"/>
+      </svg>
+      <span id="heartLabel">ib · el peso te acompaña</span>
+    </div>
+    <div id="cartouches">
+      <div class="slot" id="slot0"></div>
+      <div class="slot" id="slot1"></div>
+      <span id="cartLabel">Declaraciones 0/2</span>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+  <div id="hint"></div>
+  <div id="controlsHint">
+    <kbd>A</kbd><kbd>D</kbd> o <kbd>←</kbd><kbd>→</kbd> moverse ·
+    <kbd>ESPACIO</kbd> saltar · <kbd>W</kbd><kbd>S</kbd> o <kbd>↑</kbd><kbd>↓</kbd> carril ·
+    <kbd>E</kbd> interactuar · <kbd>M</kbd> sonido
+  </div>
+
+  <!-- ===== PANTALLA DE TÍTULO ===== -->
+  <div id="title" class="screen">
+    <h1>LA TUMBA DEL FARAÓN</h1>
+    <div class="sub">DEMO TÉCNICA · 2.5D · THREE.JS</div>
+    <div class="ctrl">
+      <span><kbd>A</kbd> <kbd>D</kbd> / <kbd>←</kbd> <kbd>→</kbd></span><span>moverse</span>
+      <span><kbd>ESPACIO</kbd></span><span>saltar</span>
+      <span><kbd>W</kbd> <kbd>S</kbd> / <kbd>↑</kbd> <kbd>↓</kbd></span><span>cambiar de carril · fondo / frente</span>
+      <span><kbd>E</kbd></span><span>interactuar · esconderse · tomar</span>
+      <span><kbd>M</kbd></span><span>silenciar sonido</span>
+    </div>
+    <div class="quote">«Despiertas en la Duat. Tu corazón pesa.<br>
+      Reúne las dos declaraciones y alcanza la Puerta del Alba.»</div>
+    <div class="divider"></div>
+    <div class="pressKey">ENTER — DESPERTAR</div>
+  </div>
+
+  <!-- ===== MUERTE ===== -->
+  <div id="death" class="screen hidden">
+    <h1 class="red">TU NOMBRE HA SIDO BORRADO DEL MURO</h1>
+    <div class="quote">Ammit te ha devorado. La segunda muerte no conoce retorno…<br>
+      salvo por la gracia de quien aún recuerda tu nombre.</div>
+    <div class="divider"></div>
+    <div class="pressKey">R — RENACER</div>
+  </div>
+
+  <!-- ===== VICTORIA ===== -->
+  <div id="win" class="screen hidden">
+    <div id="winStars"></div>
+    <h1>LA PUERTA DEL ALBA</h1>
+    <div class="quote">Cruzaste la primera puerta del Duat.<br>
+      La demo termina donde el camino comienza.</div>
+    <div class="divider"></div>
+    <div class="pressKey">R — VOLVER A EMPEZAR</div>
+  </div>
+
+  <script src="libs/three.min.js"></script>
+  <script src="js/textures.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
