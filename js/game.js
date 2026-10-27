@@ -684,8 +684,11 @@ function updateDoor(dt) {
 /* ================= CÁMARA ================= */
 let camX = 4;
 function updateCamera(dt) {
-  const targetX = P.x + 1.5;
-  camX += (targetX - camX) * Math.min(1, dt * 3.2);
+  /* sesgo según mirada: mira hacia donde mira el Faraón, no siempre a +x.
+     Antes: target fijo P.x+1.5 → yendo a la izquierda el lag dejaba al
+     jugador a 4.25 u del centro, dentro de la viñeta (invisible) */
+  const targetX = P.x + P.dir * 1.0;
+  camX += (targetX - camX) * Math.min(1, dt * 5.5);
   const targetFov = P.hidden ? 46 : 50;
   camera.fov += (targetFov - camera.fov) * Math.min(1, dt * 2.5);
   camera.updateProjectionMatrix();
