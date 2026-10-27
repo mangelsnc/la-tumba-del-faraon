@@ -11,8 +11,8 @@ const WALK_SPD = 7.2;
 const JUMP_V   = 10.6;
 const GRAV     = -27;
 const AMMIT_PATROL = 3.1;
-const AMMIT_CHASE  = 6.6;
-const VIEW_SAME = 11, VIEW_ADJ = 7;
+const AMMIT_CHASE  = 6.0;
+const VIEW_SAME = 7.5, VIEW_ADJ = 4.5;
 const CORRIDOR_MIN = -3.8, CORRIDOR_MAX = 60.6;
 
 /* ================= estado global ================= */
@@ -30,7 +30,7 @@ const P = {                     // jugador
   anim: 0, frame: 0, beat: 0, weight: false, decl: 0
 };
 const A = {                     // Ammit
-  x: 34, z: LANE_Z[0], dir: -1, chasing: false,
+  x: 16, z: LANE_Z[0], dir: -1, chasing: false,
   lastSeen: 0, sniff: 0, knows: false, anim: 0
 };
 const D = { open: false, t: 0 };
@@ -462,7 +462,9 @@ function updateAmmit(dt) {
   /* --- ¿te ve? --- */
   if (!P.hidden) {
     const view = laneDiff === 0 ? VIEW_SAME : (laneDiff === 1 ? VIEW_ADJ : 0);
-    if (Math.abs(dx) < view) {
+    /* solo ve hacia donde mira: si estás detrás, no te ve */
+    const ahead = Math.sign(dx) === A.dir;
+    if (ahead && Math.abs(dx) < view) {
       if (!A.chasing) {
         A.chasing = true; A.knows = false;
         toast('Ammit te ha visto. <em>Corre.</em>', 2.2);
@@ -482,7 +484,7 @@ function updateAmmit(dt) {
     A.dir = dir !== 0 ? dir : A.dir;
     /* se acerca a tu carril mientras persigue */
     const tz = A.knows ? LANE_Z[0] : LANE_Z[P.lane];
-    A.z += Math.sign(tz - A.z) * Math.min(Math.abs(tz - A.z), 4.5 * dt);
+    A.z += Math.sign(tz - A.z) * Math.min(Math.abs(tz - A.z), 2.6 * dt);
 
     if (!A.knows && !P.hidden && Math.abs(A.x - P.x) < 1.35 && Math.abs(A.z - P.z) < 1.2) {
       kill();
@@ -494,7 +496,7 @@ function updateAmmit(dt) {
       A.chasing = false; A.sniff = 0;
       toast('Ammit pierde tu rastro… <em>por ahora.</em>', 2.6);
     }
-    if (!P.hidden && Math.abs(A.x - P.x) > 16) { A.chasing = false; }
+    if (!P.hidden && Math.abs(A.x - P.x) > 10) { A.chasing = false; }
   } else {
     /* patrulla el carril del fondo */
     A.x += A.dir * AMMIT_PATROL * dt;
@@ -690,7 +692,7 @@ function updateCamera(dt) {
   /* cámara DENTRO del corredor: lateral con leve picado, estilo Klonoa.
      Nunca fuera del muro frontal (z=6.2): la cámara mira desde z=5.6 */
   camera.position.set(camX, 4.2, 5.6);
-  camera.lookAt(camX + 2.5, 1.9, -0.5);
+  camera.lookAt(camX + 0.5, 1.9, -0.5);
 }
 
 /* ================= HUD y pistas ================= */
@@ -718,7 +720,7 @@ function resetGame() {
     x: -2, lane: 1, z: 0, y: 0, vy: 0, ground: true, dir: 1,
     hidden: false, hideType: null, anim: 0, frame: 0, beat: 0.4, weight: false, decl: 0
   });
-  Object.assign(A, { x: 34, z: LANE_Z[0], dir: -1, chasing: false, lastSeen: 0, sniff: 0, knows: false, anim: 0 });
+  Object.assign(A, { x: 16, z: LANE_Z[0], dir: -1, chasing: false, lastSeen: 0, sniff: 0, knows: false, anim: 0 });
   D.open = false; D.t = 0;
   door.position.y = 2.8;
   doorGroup.userData.seal.material.opacity = 1;
@@ -757,11 +759,11 @@ function boot() {
 
   camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 90);
   camera.position.set(4, 4.2, 5.6);
-  camera.lookAt(6.5, 1.9, -0.5);
+  camera.lookAt(4.5, 1.9, -0.5);
 
   /* luz ambiente mínima: la tumba está muerta */
-  scene.add(new THREE.AmbientLight(0x2a2016, 1.05));
-  const hemi = new THREE.HemisphereLight(0x141a38, 0x20140c, 0.6);
+  scene.add(new THREE.AmbientLight(0x8a6f4d, 0.42));
+  const hemi = new THREE.HemisphereLight(0x2a3a6e, 0x4a3420, 0.5);
   scene.add(hemi);
 
   TXA = TX.build();
