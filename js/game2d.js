@@ -3,12 +3,12 @@
    Plataformas estilo Prince of Persia · Canvas 2D · cero assets
    ============================================================ */
 'use strict';
-console.log('[TUMBA-2D] v4 · spawns seguros');
+console.log('[TUMBA-2D] v5 · corredor jugable');
 
 /* ================= constantes ================= */
 const VW = 1280, VH = 720;              // lienzo lógico
 const GRAV = 1500;                     // px/s² (canvas: y crece hacia ABAJO)
-const RUN = 280, JUMP = -640;
+const RUN = 280, JUMP = -680;   /* 154px de salto: plataformas a 2 filas con margen */
 const TILE = 64;
 const AMMIT_PATROL = 70, AMMIT_CHASE = 205;
 const VIEW = 300;                      // visión de Ammit, hacia donde mira
@@ -54,9 +54,9 @@ const LEVELS = [
     '#..........................................#',
     '#..........................................#',
     '#..........................................#',
-    '#..........................................#',
-    '#......I.......I...........................#',
-    '#.F...PPPP....PPPP....PPPPM...APPP.G..PXPPD#',
+    '#......I.......I...............G...........#',
+    '#.....PPPP....PPPP....PPPP....PPPP....PPPP.#',
+    '#.F.......................M...A.....X....D.#',
     '############################################',
   ] },
   { name: 'II · EL POZO', map: [
