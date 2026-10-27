@@ -826,6 +826,8 @@ if (typeof window !== 'undefined' && !window.__TEROS_TEST__) {
   boot();
 }
 
+
+
 /* gancho de depuración: window.__DBG() desde la consola del navegador */
 if (typeof window !== 'undefined') {
   window.__DBG = () => ({
