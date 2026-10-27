@@ -3,6 +3,7 @@
    Sprites planos en escena 3D · three.js r128 · cero assets
    ============================================================ */
 'use strict';
+console.log('[TUMBA] game.js v6 · cámara simétrica + Ammit justa + __DBG');
 
 /* ================= constantes de diseño ================= */
 const LANE_Z   = [-3.4, 0, 3.4];      // 0 fondo · 1 medio · 2 frente
