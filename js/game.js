@@ -187,12 +187,11 @@ function buildWorld() {
   const cap1 = new THREE.Mesh(capGeo, capMat); cap1.position.set(-4.5, 4, 0); scene.add(cap1);
   const cap2 = new THREE.Mesh(capGeo, capMat.clone()); cap2.position.set(66.5, 4, 0); scene.add(cap2);
 
-  /* pilares */
+  /* pilares: solo el plano del fondo (los frontales taparían la vista lateral) */
   const pilGeo = new THREE.CylinderGeometry(0.55, 0.62, 8, 10);
   const pilMat = new THREE.MeshLambertMaterial({ map: TXA.pillar });
   for (let x = 6; x <= 58; x += 8) {
     const pb = new THREE.Mesh(pilGeo, pilMat); pb.position.set(x, 4, -5.1); scene.add(pb);
-    const pf = new THREE.Mesh(pilGeo, pilMat.clone()); pf.position.set(x + 4, 4, 5.1); scene.add(pf);
   }
 
   /* braseros (luz ambiente cálida) */
@@ -683,14 +682,15 @@ function updateDoor(dt) {
 /* ================= CÁMARA ================= */
 let camX = 4;
 function updateCamera(dt) {
-  const targetX = P.x + 5.2;
+  const targetX = P.x + 1.5;
   camX += (targetX - camX) * Math.min(1, dt * 3.2);
   const targetFov = P.hidden ? 46 : 50;
   camera.fov += (targetFov - camera.fov) * Math.min(1, dt * 2.5);
   camera.updateProjectionMatrix();
-  /* por encima del muro frontal (y=8), en diagonal, mirando al corredor */
-  camera.position.set(camX, 9.7, 9.7);
-  camera.lookAt(camX - 1.2, 2.1, 0);
+  /* cámara DENTRO del corredor: lateral con leve picado, estilo Klonoa.
+     Nunca fuera del muro frontal (z=6.2): la cámara mira desde z=5.6 */
+  camera.position.set(camX, 4.2, 5.6);
+  camera.lookAt(camX + 2.5, 1.9, -0.5);
 }
 
 /* ================= HUD y pistas ================= */
@@ -756,8 +756,8 @@ function boot() {
   scene.fog = new THREE.FogExp2(0x030204, 0.026);
 
   camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 90);
-  camera.position.set(4, 9.7, 9.7);
-  camera.lookAt(2.8, 2.1, 0);
+  camera.position.set(4, 4.2, 5.6);
+  camera.lookAt(6.5, 1.9, -0.5);
 
   /* luz ambiente mínima: la tumba está muerta */
   scene.add(new THREE.AmbientLight(0x241a10, 0.55));

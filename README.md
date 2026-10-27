@@ -12,9 +12,9 @@ Abre `index.html` en cualquier navegador moderno. No requiere servidor ni conexi
 
 | Tecla | Acción |
 |---|---|
-| `A` / `D` | Moverse |
+| `A` / `D` o `←` / `→` | Moverse |
 | `ESPACIO` | Saltar |
-| `W` / `S` | Cambiar de carril (fondo ↔ frente) |
+| `W` / `S` o `↑` / `↓` | Cambiar de carril (fondo ↔ frente) |
 | `E` | Interactuar · esconderse · tomar objetos |
 | `M` | Silenciar sonido |
 | `ENTER` | Empezar · `R` renacer tras la muerte |
