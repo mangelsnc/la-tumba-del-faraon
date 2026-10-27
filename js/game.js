@@ -206,7 +206,7 @@ function buildWorld() {
       map: TXA.flame, transparent: true, depthWrite: false, opacity: 0.95
     }));
     fl.scale.set(1.1, 1.5, 1); fl.position.y = 1.75; g.add(fl);
-    const light = new THREE.PointLight(0xff9a4a, 0.85, 10, 2);
+    const light = new THREE.PointLight(0xff9a4a, 1.15, 13, 1.8);
     light.position.y = 2.1; g.add(light);
     g.position.set(bx, 0, bz);
     scene.add(g);
@@ -351,7 +351,7 @@ function buildPlayer() {
   scene.add(player);
 
   /* antorcha: luz que pinta el mundo */
-  const torch = new THREE.PointLight(0xffb46b, 1.5, 17, 2);
+  const torch = new THREE.PointLight(0xffb46b, 2.3, 24, 1.6);
   torch.position.set(0.9, 2.1, 0.35);
   scene.add(torch);
 
@@ -753,15 +753,15 @@ function boot() {
 
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x030204);
-  scene.fog = new THREE.FogExp2(0x030204, 0.026);
+  scene.fog = new THREE.FogExp2(0x050308, 0.018);
 
   camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 90);
   camera.position.set(4, 4.2, 5.6);
   camera.lookAt(6.5, 1.9, -0.5);
 
   /* luz ambiente mínima: la tumba está muerta */
-  scene.add(new THREE.AmbientLight(0x241a10, 0.55));
-  const hemi = new THREE.HemisphereLight(0x0d1230, 0x1a0f08, 0.35);
+  scene.add(new THREE.AmbientLight(0x2a2016, 1.05));
+  const hemi = new THREE.HemisphereLight(0x141a38, 0x20140c, 0.6);
   scene.add(hemi);
 
   TXA = TX.build();

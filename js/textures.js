@@ -76,10 +76,10 @@ const TX = (() => {
   /* ---------- MURO con registros jeroglíficos ---------- */
   function wallCanvas() {
     const c = cv(1024, 512), g = c.getContext('2d'), r = rng32(7331);
-    g.fillStyle = '#161210'; g.fillRect(0, 0, 1024, 512);
+    g.fillStyle = '#241c15'; g.fillRect(0, 0, 1024, 512);
     // veteado sedimentario
     for (let y = 0; y < 512; y += 3) {
-      g.fillStyle = `rgba(${20 + r() * 14 | 0},${15 + r() * 10 | 0},${11 + r() * 8 | 0},0.5)`;
+      g.fillStyle = `rgba(${34 + r() * 16 | 0},${26 + r() * 12 | 0},${18 + r() * 9 | 0},0.5)`;
       g.fillRect(0, y, 1024, 3);
     }
     // moteado
@@ -105,7 +105,7 @@ const TX = (() => {
       }
     }
     // zócalo
-    g.fillStyle = '#0d0a08'; g.fillRect(0, 470, 1024, 42);
+    g.fillStyle = '#15100c'; g.fillRect(0, 470, 1024, 42);
     g.strokeStyle = '#2c2110'; g.lineWidth = 2;
     g.beginPath(); g.moveTo(0, 470); g.lineTo(1024, 470); g.stroke();
     return c;
@@ -114,7 +114,7 @@ const TX = (() => {
   /* ---------- PILAR ---------- */
   function pillarCanvas() {
     const c = cv(256, 1024), g = c.getContext('2d'), r = rng32(1337);
-    g.fillStyle = '#1c1712'; g.fillRect(0, 0, 256, 1024);
+    g.fillStyle = '#26201a'; g.fillRect(0, 0, 256, 1024);
     // sombreado lateral (cilindro fingido)
     const sh = g.createLinearGradient(0, 0, 256, 0);
     sh.addColorStop(0, 'rgba(0,0,0,0.55)'); sh.addColorStop(0.22, 'rgba(0,0,0,0)');
@@ -134,7 +134,7 @@ const TX = (() => {
   /* ---------- SUELO ---------- */
   function floorCanvas() {
     const c = cv(512, 512), g = c.getContext('2d'), r = rng32(4041);
-    g.fillStyle = '#100e0b'; g.fillRect(0, 0, 512, 512);
+    g.fillStyle = '#191510'; g.fillRect(0, 0, 512, 512);
     const N = 4, S = 512 / N;
     for (let i = 0; i < N; i++) for (let j = 0; j < N; j++) {
       const v = 14 + r() * 10 | 0;
@@ -194,7 +194,7 @@ const TX = (() => {
   /* ---------- PUERTA sellada ---------- */
   function doorCanvas() {
     const c = cv(512, 768), g = c.getContext('2d'), r = rng32(555);
-    g.fillStyle = '#1e1812'; g.fillRect(0, 0, 512, 768);
+    g.fillStyle = '#2a221a'; g.fillRect(0, 0, 512, 768);
     // marco
     g.strokeStyle = '#0d0a07'; g.lineWidth = 26; g.strokeRect(13, 13, 486, 742);
     g.strokeStyle = '#3a2c14'; g.lineWidth = 4; g.strokeRect(34, 34, 444, 700);
@@ -223,7 +223,7 @@ const TX = (() => {
   /* ---------- SARCÓFAGO antropoide ---------- */
   function sarcoCanvas() {
     const c = cv(512, 1024), g = c.getContext('2d'), r = rng32(810);
-    g.fillStyle = '#14100b'; g.fillRect(0, 0, 512, 1024);
+    g.fillStyle = '#221b14'; g.fillRect(0, 0, 512, 1024);
     // bordes dorados laterales
     for (const x of [0, 472]) {
       g.fillStyle = '#57431a'; g.fillRect(x, 0, 40, 1024);
