@@ -826,6 +826,17 @@ if (typeof window !== 'undefined' && !window.__TEROS_TEST__) {
   boot();
 }
 
+/* gancho de depuración: window.__DBG() desde la consola del navegador */
+if (typeof window !== 'undefined') {
+  window.__DBG = () => ({
+    state,
+    player: { x: P.x, y: P.y, z: P.z, lane: P.lane, hidden: P.hidden, decl: P.decl, weight: P.weight },
+    ammit: { x: A.x, z: A.z, dir: A.dir, chasing: A.chasing, knows: A.knows },
+    near: interactables.filter(i => !i.taken && Math.hypot(P.x - i.x, P.z - i.z) < i.r + 0.6)
+      .map(i => ({ type: i.type, d: +Math.hypot(P.x - i.x, P.z - i.z).toFixed(2) }))
+  });
+}
+
 /* gancho para pruebas automatizadas en Node (sin navegador) */
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { P, A, D, interact, unhide, resetGame, startGame, boot, get state() { return state; }, set state(v) { state = v; }, keys, interactables, LANE_Z };
