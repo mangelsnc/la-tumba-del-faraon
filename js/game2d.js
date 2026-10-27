@@ -3,7 +3,7 @@
    Plataformas estilo Prince of Persia · Canvas 2D · cero assets
    ============================================================ */
 'use strict';
-console.log('[TUMBA-2D] v3 · física real');
+console.log('[TUMBA-2D] v4 · spawns seguros');
 
 /* ================= constantes ================= */
 const VW = 1280, VH = 720;              // lienzo lógico
@@ -56,7 +56,7 @@ const LEVELS = [
     '#..........................................#',
     '#..........................................#',
     '#......I.......I...........................#',
-    '#.F.A.PPPP....PPPP....PPPPM...PPPP.G..PXPPD#',
+    '#.F...PPPP....PPPP....PPPPM...APPP.G..PXPPD#',
     '############################################',
   ] },
   { name: 'II · EL POZO', map: [
